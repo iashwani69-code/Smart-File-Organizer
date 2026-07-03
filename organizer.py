@@ -1,9 +1,7 @@
 import os
 import shutil
 
-FOLDER = input("Enter folder path: ")
-
-file_types = {
+FILE_TYPES = {
     "Images": [".jpg", ".jpeg", ".png", ".gif"],
     "Documents": [".pdf", ".docx", ".txt"],
     "Videos": [".mp4", ".mkv", ".avi"],
@@ -11,24 +9,39 @@ file_types = {
     "Archives": [".zip", ".rar"]
 }
 
-if not os.path.exists(FOLDER):
-    print("Folder not found!")
-    exit()
+def get_folder_path():
+    folder = input("Enter folder path: ")
+    return folder
 
-for file in os.listdir(FOLDER):
-    file_path = os.path.join(FOLDER, file)
+def create_destination_folder(base_folder, folder_name):
+    destination = os.path.join(base_folder, folder_name)
+    if not os.path.exists(destination):
+        os.makedirs(destination)
+    return destination
 
-    if os.path.isfile(file_path):
-        extension = os.path.splitext(file)[1].lower()
+def organize_files(folder_path):
+    if not os.path.exists(folder_path):
+        print("Folder not found!")
+        return
 
-        for folder_name, extensions in file_types.items():
-            if extension in extensions:
-                destination = os.path.join(FOLDER, folder_name)
+    for file_name in os.listdir(folder_path):
+        file_path = os.path.join(folder_path, file_name)
 
-                if not os.path.exists(destination):
-                    os.makedirs(destination)
+        if os.path.isfile(file_path):
+            extension = os.path.splitext(file_name)[1].lower()
 
-                shutil.move(file_path, os.path.join(destination, file))
-                print(f"Moved {file} -> {folder_name}")
+            for folder_name, extensions in FILE_TYPES.items():
+                if extension in extensions:
+                    destination_folder = create_destination_folder(folder_path, folder_name)
+                    shutil.move(file_path, os.path.join(destination_folder, file_name))
+                    print(f"Moved {file_name} -> {folder_name}")
+                    break
 
-print("Done! Files organized successfully.")
+    print("Done! Files organized successfully.")
+
+def main():
+    folder_path = get_folder_path()
+    organize_files(folder_path)
+
+if __name__ == "__main__":
+    main()
